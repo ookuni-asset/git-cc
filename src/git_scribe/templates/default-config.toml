@@ -1,0 +1,60 @@
+# git-scribe default configuration.
+# Copied to your repo via `git scribe init`. Override fields as needed.
+
+[rules]
+# Markdown files describing your project's commit conventions.
+# First found wins. Falls back to git-scribe's bundled default rules.
+search = [
+  ".cursor/rules/git-commit.mdc",
+  ".gitscribe/rules.md",
+  "COMMIT_GUIDELINES.md",
+]
+
+[llm]
+# External LLM CLI to invoke. If the string contains "{prompt}" it is
+# substituted; otherwise the prompt is sent on stdin.
+command     = "claude"
+timeout_sec = 60
+# If true, exit with error when the LLM call fails (no heuristic fallback).
+required    = false
+
+[commit]
+# Optional trailer appended to the final message (e.g. Co-Authored-By).
+trailer = ""
+
+[push]
+enabled    = true
+# When true, run `gh repo set-default / auth status / repo sync` before push.
+require_gh = false
+
+[language]
+# Language used for the heuristic-fallback subject when LLM is unavailable.
+fallback_lang = "ja"
+
+[scope]
+# Directory prefix → scope name. First match wins. Customize per project.
+# Examples:
+#   { prefix = "src/api/", scope = "api" },
+#   { prefix = "docs/",    scope = "docs" },
+mappings = []
+
+[type]
+# Glob-based fallback type inference for the heuristic generator.
+# When all changed files match docs_globs → "docs"
+# When any changed file matches ci_globs → "ci"
+# When any changed file matches build_globs → "build"
+# When any changed file matches test_globs → "test"
+# Otherwise → fallback.
+docs_globs  = ["docs/**", "**/*.md", "**/*.mdx"]
+ci_globs    = [".github/**", ".gitlab-ci.yml", "Jenkinsfile", ".circleci/**"]
+test_globs  = ["**/tests/**", "**/__tests__/**", "**/*.test.*", "**/*.spec.*"]
+build_globs = [
+  "package.json", "pnpm-lock.yaml", "yarn.lock", "package-lock.json",
+  "composer.json", "composer.lock",
+  "pyproject.toml", "uv.lock", "poetry.lock", "Pipfile", "Pipfile.lock", "requirements.txt",
+  "go.mod", "go.sum",
+  "Cargo.toml", "Cargo.lock",
+  "Gemfile", "Gemfile.lock",
+  "pom.xml", "build.gradle", "build.gradle.kts",
+]
+fallback = "chore"

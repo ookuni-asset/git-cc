@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "git-scribe"
+version = "0.1.0"
+description = "AI-assisted Conventional Commits CLI: generate, review, commit, and push."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "ookuni", email = "dev@ookuni-asset.com" }]
+keywords = ["git", "commit", "conventional-commits", "ai", "llm", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+git-scribe = "git_scribe.cli:main"
+
+# [project.urls]   # private use — uncomment when publishing
+# Homepage   = "https://github.com/<owner>/git-scribe"
+# Repository = "https://github.com/<owner>/git-scribe"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/git_scribe"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/git_scribe", "README.md", "LICENSE", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
