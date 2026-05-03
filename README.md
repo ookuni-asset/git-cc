@@ -4,19 +4,41 @@ AI-assisted Conventional Commits CLI. Generate a commit message from your diff, 
 
 Designed to be **language-agnostic**: works for Python, PHP, TypeScript, Go, Rust, etc. All project-specific rules live in `.gitscribe.toml`, not in the tool's source code.
 
-## Install (local / private)
+## Install
 
-This repository is currently private. Install from a local checkout:
+This repository is currently private. Install from a local checkout.
+
+### Quickest (recommended for team distribution)
 
 ```bash
-# uv (recommended for local dev)
+git clone <repo-url> && cd git-scribe
+./install.sh
+```
+
+The script bootstraps [uv](https://docs.astral.sh/uv/) if it is not already on
+`PATH`, then installs `git-scribe`. **No system Python required** — uv fetches
+a suitable Python 3.11+ interpreter automatically.
+
+> Windows users: use uv's native installer (`powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`),
+> then run `uv tool install --from . git-scribe` from inside the repo.
+
+### Manual install (if you already have a Python toolchain)
+
+```bash
+# uv (recommended)
 uv tool install --from /path/to/git-scribe git-scribe
 
-# or pipx, from local path
+# or pipx
 pipx install /path/to/git-scribe
 ```
 
 After install, both `git-scribe` and `git scribe` work — Git auto-discovers `git-*` binaries on `PATH`.
+
+Verify your environment:
+
+```bash
+git scribe doctor
+```
 
 ## Quick start
 
