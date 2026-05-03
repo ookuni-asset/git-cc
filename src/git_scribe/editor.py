@@ -5,6 +5,7 @@ import os
 import shlex
 import subprocess
 import tempfile
+from contextlib import suppress
 from pathlib import Path
 
 
@@ -19,7 +20,5 @@ def review(initial: str) -> str:
         subprocess.run(cmd, check=True)
         return path.read_text(encoding="utf-8")
     finally:
-        try:
+        with suppress(Exception):
             path.unlink(missing_ok=True)
-        except Exception:
-            pass

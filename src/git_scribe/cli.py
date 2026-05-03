@@ -6,19 +6,22 @@ import json
 import re
 import sys
 import tempfile
+from contextlib import suppress
 from dataclasses import asdict
 from pathlib import Path
 
-from . import __version__
-from . import changes as changes_mod
-from . import config as config_mod
-from . import editor as editor_mod
-from . import git
-from . import heuristics
-from . import init_cmd
-from . import llm
-from . import prompt as prompt_mod
-from . import validator
+from . import (
+    __version__,
+    changes as changes_mod,
+    config as config_mod,
+    editor as editor_mod,
+    git,
+    heuristics,
+    init_cmd,
+    llm,
+    prompt as prompt_mod,
+    validator,
+)
 
 _SUBCOMMANDS = {"commit", "print", "init", "config", "doctor"}
 _GLOBAL_FLAGS = {"--version", "-h", "--help"}
@@ -27,7 +30,6 @@ _GLOBAL_FLAGS = {"--version", "-h", "--help"}
 def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
-    # Default to "commit" when no subcommand and no global flag is given.
     if not argv or (argv[0] not in _SUBCOMMANDS and argv[0] not in _GLOBAL_FLAGS):
         argv = ["commit", *argv]
 
@@ -77,7 +79,7 @@ def _add_main_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--llm-command", help="override [llm].command")
     p.add_argument("--llm-timeout-sec", type=int, help="override [llm].timeout_sec")
     p.add_argument("--config", help="path to .gitscribe.toml (override discovery)")
-    p.add_argument("--lang", choices=["ja", "en"], help="fallback subject language")
+    p.add_argument("--lang", help="output language code (en, ja, or any code your LLM understands)")
     p.add_argument("--dry-run", action="store_true", help="generate but do not commit/push")
 
 
@@ -85,22 +87,14 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
     if not git.have("git"):
         print("git not found", file=sys.stderr)
         return 2
-    try:
-        root = git.repo_root()
-    except Exception:
+    root = git.try_repo_root()
+    if root is None:
         print("not inside a git repository", file=sys.stderr)
         return 2
 
     explicit = Path(args.config).resolve() if args.config else None
     cfg = config_mod.load(repo_root=root, explicit=explicit)
-    if args.llm_command:
-        cfg.llm_command = args.llm_command
-    if args.llm_timeout_sec:
-        cfg.llm_timeout_sec = args.llm_timeout_sec
-    if args.llm_required:
-        cfg.llm_required = True
-    if args.lang:
-        cfg.output_lang = args.lang
+    _apply_cli_overrides(cfg, args)
 
     issue = _normalize_issue(args.issue)
     if args.issue and issue is None:
@@ -115,6 +109,33 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
         print("no changes to commit", file=sys.stderr)
         return 0
 
+    _print_change_summary(ch)
+    msg = _generate_message(ch, cfg, root=root, issue=issue, no_llm=args.no_llm)
+
+    if print_only:
+        print("=== generated commit message ===")
+        print(msg.rstrip("\n"))
+        return 0
+    if args.dry_run:
+        print("=== dry-run: final message would be ===")
+        print(msg.rstrip("\n"))
+        return 0
+
+    return _review_commit_push(msg, cfg, args)
+
+
+def _apply_cli_overrides(cfg: config_mod.Config, args: argparse.Namespace) -> None:
+    if args.llm_command:
+        cfg.llm_command = args.llm_command
+    if args.llm_timeout_sec:
+        cfg.llm_timeout_sec = args.llm_timeout_sec
+    if args.llm_required:
+        cfg.llm_required = True
+    if args.lang:
+        cfg.output_lang = args.lang
+
+
+def _print_change_summary(ch: changes_mod.Changes) -> None:
     print("=== changed files ===")
     for f in ch.files:
         print(f"- {f}")
@@ -123,18 +144,8 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
         print(ch.diff_stat)
     print()
 
-    msg = _generate_message(ch, cfg, root=root, issue=issue, no_llm=args.no_llm)
 
-    if print_only:
-        print("=== generated commit message ===")
-        print(msg.rstrip("\n"))
-        return 0
-
-    if args.dry_run:
-        print("=== dry-run: final message would be ===")
-        print(msg.rstrip("\n"))
-        return 0
-
+def _review_commit_push(msg: str, cfg: config_mod.Config, args: argparse.Namespace) -> int:
     edited = editor_mod.review(msg)
     ok, reason = validator.validate(edited)
     if not ok:
@@ -148,10 +159,8 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
     try:
         git.commit_with_file(final_path)
     finally:
-        try:
+        with suppress(Exception):
             final_path.unlink(missing_ok=True)
-        except Exception:
-            pass
 
     if args.no_push or not cfg.push_enabled:
         return 0
@@ -162,8 +171,8 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
 
 
 def _generate_message(
-    ch,
-    cfg,
+    ch: changes_mod.Changes,
+    cfg: config_mod.Config,
     *,
     root: Path,
     issue: str | None,
@@ -213,11 +222,7 @@ def _write_temp(content: str) -> Path:
 
 
 def _run_config() -> int:
-    try:
-        root = git.repo_root()
-    except Exception:
-        root = None
-    cfg = config_mod.load(repo_root=root)
+    cfg = config_mod.load(repo_root=git.try_repo_root())
     print(json.dumps(asdict(cfg), indent=2, ensure_ascii=False))
     return 0
 
@@ -234,14 +239,8 @@ def _run_doctor() -> int:
             ok = False
 
     check("git available", git.have("git"))
-    in_repo = False
-    root: Path | None = None
-    try:
-        root = git.repo_root()
-        in_repo = True
-    except Exception:
-        pass
-    check("inside git repository", in_repo)
+    root = git.try_repo_root()
+    check("inside git repository", root is not None)
 
     cfg = config_mod.load(repo_root=root)
     cmd_first = cfg.llm_command.split()[0] if cfg.llm_command else ""

@@ -1,5 +1,3 @@
-import os
-
 from git_scribe import config as cfg_mod
 
 
@@ -51,7 +49,11 @@ def test_env_var_overrides_timeout(tmp_path, monkeypatch):
 
 def test_scope_mappings(tmp_path):
     (tmp_path / ".gitscribe.toml").write_text(
-        '[scope]\nmappings = [\n  { prefix = "src/api/", scope = "api" },\n  { prefix = "docs/",    scope = "docs" },\n]\n',
+        '[scope]\n'
+        'mappings = [\n'
+        '  { prefix = "src/api/", scope = "api" },\n'
+        '  { prefix = "docs/",    scope = "docs" },\n'
+        ']\n',
         encoding="utf-8",
     )
     cfg = cfg_mod.load(repo_root=tmp_path)

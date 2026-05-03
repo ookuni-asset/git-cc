@@ -8,9 +8,8 @@ from . import git
 
 
 def run(*, cursor: bool, force: bool) -> int:
-    try:
-        root = git.repo_root()
-    except Exception:
+    root = git.try_repo_root()
+    if root is None:
         print("ERROR: not inside a git repository", file=sys.stderr)
         return 2
 

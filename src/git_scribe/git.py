@@ -18,29 +18,38 @@ def output(args: list[str]) -> str:
     return run(args).stdout.strip()
 
 
+def try_repo_root() -> Path | None:
+    result = run(["rev-parse", "--show-toplevel"], check=False)
+    if result.returncode != 0:
+        return None
+    return Path(result.stdout.strip())
+
+
 def repo_root() -> Path:
-    return Path(output(["rev-parse", "--show-toplevel"]))
+    root = try_repo_root()
+    if root is None:
+        raise RuntimeError("not inside a git repository")
+    return root
 
 
 def stage_all() -> None:
-    subprocess.run(["git", "add", "-A"], check=True)
+    run(["add", "-A"], capture=False)
 
 
 def commit_with_file(path: Path) -> None:
-    subprocess.run(["git", "commit", "-F", str(path)], check=True)
+    run(["commit", "-F", str(path)], capture=False)
 
 
 def push() -> None:
-    upstream = subprocess.run(
-        ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
-        capture_output=True,
-        text=True,
+    upstream = run(
+        ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+        check=False,
     )
     if upstream.returncode != 0:
         branch = output(["rev-parse", "--abbrev-ref", "HEAD"])
-        subprocess.run(["git", "push", "-u", "origin", branch], check=True)
+        run(["push", "-u", "origin", branch], capture=False)
     else:
-        subprocess.run(["git", "push"], check=True)
+        run(["push"], capture=False)
 
 
 def gh_warmup() -> None:

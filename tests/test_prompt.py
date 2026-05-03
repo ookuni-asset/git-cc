@@ -1,6 +1,6 @@
 from git_scribe.changes import Changes
-from git_scribe.prompt import build, resolve_rules_text
 from git_scribe.config import Config
+from git_scribe.prompt import build, resolve_rules_text
 
 
 def test_build_includes_rules_files_and_diff():
