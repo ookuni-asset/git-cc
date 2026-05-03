@@ -30,23 +30,21 @@ When you run `git scribe`, it walks through these steps:
 
 ## 1. Install
 
-### Quickest (recommended for team distribution)
+If you don't have [uv](https://docs.astral.sh/uv/) yet, the one-liner below bootstraps uv and then installs git-scribe in one shot — no clone, no Python toolchain required:
 
 ```bash
-git clone <repo-url> && cd git-scribe
-./install.sh
+curl -LsSf https://raw.githubusercontent.com/ookuni-asset/git-scribe/main/install.sh | bash
 ```
 
-The script bootstraps [uv](https://docs.astral.sh/uv/) if missing, then installs `git-scribe`. **No system Python required** — uv fetches a suitable Python 3.11+ interpreter automatically.
-
-> Windows: install uv via `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`, then run `uv tool install --from . git-scribe` from inside the repo.
-
-### Manual install (if you already have a Python toolchain)
+If you already have uv, install directly from the public repo URL:
 
 ```bash
-uv tool install --from /path/to/git-scribe git-scribe   # uv (recommended)
-pipx install /path/to/git-scribe                        # pipx
+uv tool install --from "git+https://github.com/ookuni-asset/git-scribe.git" git-scribe
 ```
+
+Cloning the repo and running `./install.sh` works the same way.
+
+> Windows: install uv via `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`, then run the `uv tool install` command above.
 
 After install, both `git-scribe` and `git scribe` work — Git auto-discovers `git-*` binaries on `PATH`.
 
@@ -56,9 +54,19 @@ Verify your environment:
 git scribe doctor
 ```
 
+### Updating
+
+```bash
+uv tool upgrade git-scribe
+```
+
+uv re-fetches the latest commit from GitHub and rebuilds in place. No clone or script needed.
+
 ---
 
 ## 2. Usage
+
+`git scribe` is installed once but run **from inside each repo**, the same way `git` itself works — `cd` into the project you want to commit, then run it. The tool auto-detects the current repository via `git rev-parse --show-toplevel`. Per-project settings (LLM, rules, scope mappings) live in that repo's `.gitscribe.toml`; personal cross-project defaults can go in `~/.config/git-scribe/config.toml`.
 
 ### Quick start
 
@@ -77,6 +85,7 @@ git scribe                # generate → review → commit → push
 |---|---|
 | `git scribe` | Run the main flow |
 | `git scribe -a` | Stage everything (`git add -A`) before generating |
+| `git scribe --prefer-staged` | When something is staged, generate from the staged diff only (ignore unstaged/untracked) |
 | `git scribe --issue 123` | Append `#123` to the subject |
 | `git scribe --no-push` | Commit only, do not push |
 | `git scribe --no-llm` | Skip LLM, use heuristic fallback only |
