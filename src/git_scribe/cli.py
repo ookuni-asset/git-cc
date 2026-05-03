@@ -100,7 +100,7 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
     if args.llm_required:
         cfg.llm_required = True
     if args.lang:
-        cfg.fallback_lang = args.lang
+        cfg.output_lang = args.lang
 
     issue = _normalize_issue(args.issue)
     if args.issue and issue is None:
@@ -174,7 +174,13 @@ def _generate_message(
     try:
         rules_text = prompt_mod.resolve_rules_text(root, cfg)
         patch = changes_mod.get_patch(ch)
-        prompt = prompt_mod.build(rules_text=rules_text, changes=ch, issue=issue, patch=patch)
+        prompt = prompt_mod.build(
+            rules_text=rules_text,
+            changes=ch,
+            issue=issue,
+            patch=patch,
+            output_lang=cfg.output_lang,
+        )
         out = llm.run(command=cfg.llm_command, prompt=prompt, timeout_sec=cfg.llm_timeout_sec)
         out = llm.strip_code_fences(out)
         if not out.strip():

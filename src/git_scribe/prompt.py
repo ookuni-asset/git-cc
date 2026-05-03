@@ -6,8 +6,14 @@ from pathlib import Path
 from .changes import Changes
 from .config import Config
 
+_LANG_LABELS = {"en": "English", "ja": "日本語 (Japanese)"}
 
-def build(*, rules_text: str, changes: Changes, issue: str | None, patch: str) -> str:
+
+def _lang_label(code: str) -> str:
+    return _LANG_LABELS.get(code) or code or "English"
+
+
+def build(*, rules_text: str, changes: Changes, issue: str | None, patch: str, output_lang: str) -> str:
     issue_hint = issue or ""
     files = "\n".join(f"- {f}" for f in changes.files)
     staged = "staged" if changes.staged else "mixed/unstaged"
@@ -30,6 +36,9 @@ def build(*, rules_text: str, changes: Changes, issue: str | None, patch: str) -
         "",
         "### diff (patch)",
         patch.strip(),
+        "",
+        "## Output language",
+        f"Write the commit subject and body in {_lang_label(output_lang)}.",
         "",
         "## Output requirements",
         "- Output ONLY the final commit message as plain text.",

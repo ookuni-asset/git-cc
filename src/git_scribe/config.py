@@ -30,7 +30,7 @@ class Config:
     commit_trailer: str = ""
     push_enabled: bool = True
     require_gh: bool = False
-    fallback_lang: str = ""
+    output_lang: str = ""
     scope_mappings: list[ScopeMapping] = field(default_factory=list)
     type_docs_globs: list[str] = field(default_factory=list)
     type_ci_globs: list[str] = field(default_factory=list)
@@ -111,8 +111,8 @@ def _to_config(d: dict[str, Any]) -> Config:
         cfg.push_enabled = bool(push["enabled"])
     if "require_gh" in push:
         cfg.require_gh = bool(push["require_gh"])
-    if "fallback_lang" in lang:
-        cfg.fallback_lang = str(lang["fallback_lang"])
+    if "output_lang" in lang:
+        cfg.output_lang = str(lang["output_lang"])
     if "mappings" in scope:
         cfg.scope_mappings = [
             ScopeMapping(prefix=str(m["prefix"]), scope=str(m["scope"]))

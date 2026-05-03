@@ -34,7 +34,7 @@ def guess_type(files: list[str], cfg: Config) -> str:
 
 
 def fallback_subject(cfg: Config) -> str:
-    return _FALLBACK_SUBJECT.get(cfg.fallback_lang, _FALLBACK_SUBJECT["en"])
+    return _FALLBACK_SUBJECT.get(cfg.output_lang, _FALLBACK_SUBJECT["en"])
 
 
 def generate(changes: Changes, cfg: Config, *, issue: str | None) -> str:

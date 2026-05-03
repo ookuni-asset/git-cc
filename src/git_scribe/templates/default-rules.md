@@ -3,13 +3,6 @@
 This document is the language-agnostic default used by `git-scribe` when no
 project-specific rules file is found.
 
-## Language
-
-Write the commit message in the **same natural language used to write this
-rules document**. (To switch languages for your project, run
-`git scribe init` and translate `COMMIT_GUIDELINES.md` — the LLM will then
-follow that language deterministically.)
-
 ## Format
 
 ```

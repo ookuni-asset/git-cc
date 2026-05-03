@@ -34,8 +34,13 @@ enabled    = true
 require_gh = false
 
 [language]
-# Language used for the heuristic-fallback subject when LLM is unavailable.
-fallback_lang = "ja"
+# Natural language used for the generated commit message (LLM and the
+# heuristic fallback both honor this).
+# Common codes: "en" (English), "ja" (Japanese). Any string is passed
+# through to the LLM as a hint, so other codes work if your model
+# supports them. Override per project in .gitscribe.toml or per command
+# with `git scribe --lang ja`.
+output_lang = "en"
 
 [scope]
 # Directory prefix → scope name. First match wins. Customize per project.

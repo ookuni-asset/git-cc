@@ -14,7 +14,7 @@ def _cfg(**overrides) -> Config:
         type_test_globs=["**/tests/**", "**/*.test.*"],
         type_build_globs=["package.json", "composer.json", "pyproject.toml"],
         type_fallback="chore",
-        fallback_lang="en",
+        output_lang="en",
     )
     for k, v in overrides.items():
         setattr(base, k, v)
@@ -84,14 +84,14 @@ def test_generate_includes_issue_and_scope():
 
 
 def test_generate_lang_ja_default_subject():
-    cfg = _cfg(fallback_lang="ja")
+    cfg = _cfg(output_lang="ja")
     ch = Changes(staged=False, files=["src/api/x.py"], diff_stat="", name_status=[])
     msg = generate(ch, cfg, issue=None)
     assert "変更を反映" in msg
 
 
 def test_generate_lang_en_default_subject():
-    cfg = _cfg(fallback_lang="en")
+    cfg = _cfg(output_lang="en")
     ch = Changes(staged=False, files=["src/api/x.py"], diff_stat="", name_status=[])
     msg = generate(ch, cfg, issue=None)
     assert "Update" in msg
