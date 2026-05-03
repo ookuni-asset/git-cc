@@ -1,5 +1,11 @@
 # git-scribe default configuration.
-# Copied to your repo via `git scribe init`. Override fields as needed.
+#
+# This file is the single source of truth for git-scribe's user-facing
+# defaults. It is loaded as the lowest layer of the config merge chain,
+# and is also copied verbatim into your repo by `git scribe init` so you
+# can edit it as a self-documenting starter.
+# Override fields by editing the copied file in your repo, by setting
+# values in ~/.config/git-scribe/config.toml, or via env vars.
 
 [rules]
 # Markdown files describing your project's commit conventions.

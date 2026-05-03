@@ -1,4 +1,9 @@
-"""Configuration loading and merging."""
+"""Configuration loading and merging.
+
+`templates/default-config.toml` is the single source of truth for
+user-facing defaults. The dataclass field defaults below are minimal
+placeholders so `Config()` is constructible — they are not authoritative.
+"""
 from __future__ import annotations
 
 import os
@@ -19,19 +24,19 @@ class ScopeMapping:
 @dataclass
 class Config:
     rules_search: list[str] = field(default_factory=list)
-    llm_command: str = "claude"
-    llm_timeout_sec: int = 60
+    llm_command: str = ""
+    llm_timeout_sec: int = 0
     llm_required: bool = False
     commit_trailer: str = ""
     push_enabled: bool = True
     require_gh: bool = False
-    fallback_lang: str = "ja"
+    fallback_lang: str = ""
     scope_mappings: list[ScopeMapping] = field(default_factory=list)
     type_docs_globs: list[str] = field(default_factory=list)
     type_ci_globs: list[str] = field(default_factory=list)
     type_test_globs: list[str] = field(default_factory=list)
     type_build_globs: list[str] = field(default_factory=list)
-    type_fallback: str = "chore"
+    type_fallback: str = ""
 
 
 def load(repo_root: Path | None = None, explicit: Path | None = None) -> Config:
@@ -82,6 +87,8 @@ def _deep_update(dst: dict[str, Any], src: dict[str, Any]) -> None:
 
 
 def _to_config(d: dict[str, Any]) -> Config:
+    cfg = Config()
+
     rules = d.get("rules") or {}
     llm = d.get("llm") or {}
     commit = d.get("commit") or {}
@@ -90,28 +97,44 @@ def _to_config(d: dict[str, Any]) -> Config:
     scope = d.get("scope") or {}
     typ = d.get("type") or {}
 
-    mappings = [
-        ScopeMapping(prefix=str(m["prefix"]), scope=str(m["scope"]))
-        for m in (scope.get("mappings") or [])
-        if isinstance(m, dict) and "prefix" in m and "scope" in m
-    ]
+    if "search" in rules:
+        cfg.rules_search = list(rules["search"])
+    if "command" in llm:
+        cfg.llm_command = str(llm["command"])
+    if "timeout_sec" in llm:
+        cfg.llm_timeout_sec = int(llm["timeout_sec"])
+    if "required" in llm:
+        cfg.llm_required = bool(llm["required"])
+    if "trailer" in commit:
+        cfg.commit_trailer = str(commit["trailer"])
+    if "enabled" in push:
+        cfg.push_enabled = bool(push["enabled"])
+    if "require_gh" in push:
+        cfg.require_gh = bool(push["require_gh"])
+    if "fallback_lang" in lang:
+        cfg.fallback_lang = str(lang["fallback_lang"])
+    if "mappings" in scope:
+        cfg.scope_mappings = [
+            ScopeMapping(prefix=str(m["prefix"]), scope=str(m["scope"]))
+            for m in scope["mappings"]
+            if isinstance(m, dict) and "prefix" in m and "scope" in m
+        ]
+    if "docs_globs" in typ:
+        cfg.type_docs_globs = list(typ["docs_globs"])
+    if "ci_globs" in typ:
+        cfg.type_ci_globs = list(typ["ci_globs"])
+    if "test_globs" in typ:
+        cfg.type_test_globs = list(typ["test_globs"])
+    if "build_globs" in typ:
+        cfg.type_build_globs = list(typ["build_globs"])
+    if "fallback" in typ:
+        cfg.type_fallback = str(typ["fallback"])
 
     env_cmd = os.environ.get("GIT_SCRIBE_LLM_COMMAND")
+    if env_cmd:
+        cfg.llm_command = env_cmd
     env_timeout = os.environ.get("GIT_SCRIBE_LLM_TIMEOUT_SEC")
+    if env_timeout:
+        cfg.llm_timeout_sec = int(env_timeout)
 
-    return Config(
-        rules_search=list(rules.get("search") or []),
-        llm_command=env_cmd or str(llm.get("command") or "claude"),
-        llm_timeout_sec=int(env_timeout) if env_timeout else int(llm.get("timeout_sec") or 60),
-        llm_required=bool(llm.get("required", False)),
-        commit_trailer=str(commit.get("trailer") or ""),
-        push_enabled=bool(push.get("enabled", True)),
-        require_gh=bool(push.get("require_gh", False)),
-        fallback_lang=str(lang.get("fallback_lang") or "ja"),
-        scope_mappings=mappings,
-        type_docs_globs=list(typ.get("docs_globs") or []),
-        type_ci_globs=list(typ.get("ci_globs") or []),
-        type_test_globs=list(typ.get("test_globs") or []),
-        type_build_globs=list(typ.get("build_globs") or []),
-        type_fallback=str(typ.get("fallback") or "chore"),
-    )
+    return cfg
