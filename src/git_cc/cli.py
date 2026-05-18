@@ -1,4 +1,4 @@
-"""CLI entry point for `git-scribe` / `git scribe`."""
+"""CLI entry point for `git-cc` / `git cc`."""
 from __future__ import annotations
 
 import argparse
@@ -34,10 +34,10 @@ def main(argv: list[str] | None = None) -> int:
         argv = ["commit", *argv]
 
     parser = argparse.ArgumentParser(
-        prog="git-scribe",
+        prog="git-cc",
         description="AI-assisted Conventional Commits CLI.",
     )
-    parser.add_argument("--version", action="version", version=f"git-scribe {__version__}")
+    parser.add_argument("--version", action="version", version=f"git-cc {__version__}")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_commit = sub.add_parser("commit", help="generate, edit, commit, push (default)")
@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
     p_print = sub.add_parser("print", help="generate and print the message only")
     _add_main_args(p_print)
 
-    p_init = sub.add_parser("init", help="bootstrap .gitscribe.toml and rule templates")
+    p_init = sub.add_parser("init", help="bootstrap .gitcc.toml and rule templates")
     p_init.add_argument("--cursor", action="store_true", help="also install Cursor rule and skill files")
     p_init.add_argument("--force", action="store_true", help="overwrite existing files")
 
@@ -78,7 +78,7 @@ def _add_main_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--llm-required", action="store_true", help="exit on LLM failure (no fallback)")
     p.add_argument("--llm-command", help="override [llm].command")
     p.add_argument("--llm-timeout-sec", type=int, help="override [llm].timeout_sec")
-    p.add_argument("--config", help="path to .gitscribe.toml (override discovery)")
+    p.add_argument("--config", help="path to .gitcc.toml (override discovery)")
     p.add_argument("--lang", help="output language code (en, ja, or any code your LLM understands)")
     p.add_argument("--dry-run", action="store_true", help="generate but do not commit/push")
 
@@ -214,7 +214,7 @@ def _normalize_issue(raw: str | None) -> str | None:
 
 
 def _write_temp(content: str) -> Path:
-    with tempfile.NamedTemporaryFile(prefix="git-scribe-final-", suffix=".txt", mode="w+", delete=False) as f:
+    with tempfile.NamedTemporaryFile(prefix="git-cc-final-", suffix=".txt", mode="w+", delete=False) as f:
         path = Path(f.name)
         f.write(content)
         f.flush()
@@ -247,7 +247,7 @@ def _run_doctor() -> int:
     check(
         f"LLM command available: {cmd_first or '(empty)'}",
         bool(cmd_first) and git.have(cmd_first),
-        hint="install the CLI or set GIT_SCRIBE_LLM_COMMAND",
+        hint="install the CLI or set GIT_CC_LLM_COMMAND",
     )
 
     return 0 if ok else 1

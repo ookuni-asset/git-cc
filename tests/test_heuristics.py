@@ -1,6 +1,6 @@
-from git_scribe.changes import Changes
-from git_scribe.config import Config, ScopeMapping
-from git_scribe.heuristics import generate, guess_scope, guess_type, match
+from git_cc.changes import Changes
+from git_cc.config import Config, ScopeMapping
+from git_cc.heuristics import generate, guess_scope, guess_type, match
 
 
 def _cfg(**overrides) -> Config:

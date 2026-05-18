@@ -1,4 +1,4 @@
-from git_scribe.validator import validate
+from git_cc.validator import validate
 
 
 def test_accepts_simple():

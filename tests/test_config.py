@@ -1,4 +1,4 @@
-from git_scribe import config as cfg_mod
+from git_cc import config as cfg_mod
 
 
 def test_load_default_only(tmp_path):
@@ -10,7 +10,7 @@ def test_load_default_only(tmp_path):
 
 
 def test_repo_overrides_default(tmp_path):
-    (tmp_path / ".gitscribe.toml").write_text(
+    (tmp_path / ".gitcc.toml").write_text(
         '[llm]\ncommand = "codex"\ntimeout_sec = 30\n[type]\nfallback = "fix"\n',
         encoding="utf-8",
     )
@@ -25,7 +25,7 @@ def test_repo_overrides_default(tmp_path):
 def test_explicit_path_wins(tmp_path):
     custom = tmp_path / "custom.toml"
     custom.write_text('[llm]\ncommand = "llm-cli"\n', encoding="utf-8")
-    (tmp_path / ".gitscribe.toml").write_text(
+    (tmp_path / ".gitcc.toml").write_text(
         '[llm]\ncommand = "should-not-win"\n', encoding="utf-8"
     )
     cfg = cfg_mod.load(repo_root=tmp_path, explicit=custom)
@@ -33,22 +33,22 @@ def test_explicit_path_wins(tmp_path):
 
 
 def test_env_var_overrides_command(tmp_path, monkeypatch):
-    (tmp_path / ".gitscribe.toml").write_text(
+    (tmp_path / ".gitcc.toml").write_text(
         '[llm]\ncommand = "claude"\n', encoding="utf-8"
     )
-    monkeypatch.setenv("GIT_SCRIBE_LLM_COMMAND", "from-env")
+    monkeypatch.setenv("GIT_CC_LLM_COMMAND", "from-env")
     cfg = cfg_mod.load(repo_root=tmp_path)
     assert cfg.llm_command == "from-env"
 
 
 def test_env_var_overrides_timeout(tmp_path, monkeypatch):
-    monkeypatch.setenv("GIT_SCRIBE_LLM_TIMEOUT_SEC", "120")
+    monkeypatch.setenv("GIT_CC_LLM_TIMEOUT_SEC", "120")
     cfg = cfg_mod.load(repo_root=tmp_path)
     assert cfg.llm_timeout_sec == 120
 
 
 def test_scope_mappings(tmp_path):
-    (tmp_path / ".gitscribe.toml").write_text(
+    (tmp_path / ".gitcc.toml").write_text(
         '[scope]\n'
         'mappings = [\n'
         '  { prefix = "src/api/", scope = "api" },\n'

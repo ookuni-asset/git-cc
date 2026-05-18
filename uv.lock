@@ -12,7 +12,7 @@ wheels = [
 ]
 
 [[package]]
-name = "git-scribe"
+name = "git-cc"
 version = "0.1.0"
 source = { editable = "." }
 

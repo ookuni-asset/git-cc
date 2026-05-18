@@ -1,24 +1,31 @@
-# git-scribe default configuration.
+# git-cc default configuration.
 #
-# This file is the single source of truth for git-scribe's user-facing
+# This file is the single source of truth for git-cc's user-facing
 # defaults. It is loaded as the lowest layer of the config merge chain,
-# and is also copied verbatim into your repo by `git scribe init` so you
+# and is also copied verbatim into your repo by `git cc init` so you
 # can edit it as a self-documenting starter.
 # Override fields by editing the copied file in your repo, by setting
-# values in ~/.config/git-scribe/config.toml, or via env vars.
+# values in ~/.config/git-cc/config.toml, or via env vars.
 
 [rules]
 # Markdown files describing your project's commit conventions.
-# First found wins. Falls back to git-scribe's bundled default rules.
+# First found wins. Falls back to git-cc's bundled default rules.
 search = [
   ".cursor/rules/git-commit.mdc",
-  ".gitscribe/rules.md",
+  ".gitcc/rules.md",
   "COMMIT_GUIDELINES.md",
 ]
 
 [llm]
 # External LLM CLI to invoke. If the string contains "{prompt}" it is
 # substituted; otherwise the prompt is sent on stdin.
+#
+# Examples:
+#   Claude (default):  command = "claude"
+#   Cursor:            command = "cursor agent --print {prompt}"
+#   Ollama:            command = "ollama run qwen2.5-coder:7b"
+#
+# Switch via env var: GIT_CC_LLM_COMMAND="cursor agent --print {prompt}" git cc
 command     = "claude"
 timeout_sec = 60
 # If true, exit with error when the LLM call fails (no heuristic fallback).
@@ -38,8 +45,8 @@ require_gh = false
 # heuristic fallback both honor this).
 # Common codes: "en" (English), "ja" (Japanese). Any string is passed
 # through to the LLM as a hint, so other codes work if your model
-# supports them. Override per project in .gitscribe.toml or per command
-# with `git scribe --lang ja`.
+# supports them. Override per project in .gitcc.toml or per command
+# with `git cc --lang ja`.
 output_lang = "en"
 
 [scope]

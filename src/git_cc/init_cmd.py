@@ -1,4 +1,4 @@
-"""`git scribe init` — bootstrap config/templates in a project."""
+"""`git cc init` — bootstrap config/templates in a project."""
 from __future__ import annotations
 
 import sys
@@ -15,7 +15,7 @@ def run(*, cursor: bool, force: bool) -> int:
 
     templates = Path(__file__).parent / "templates"
     targets: list[tuple[Path, Path]] = [
-        (templates / "default-config.toml", root / ".gitscribe.toml"),
+        (templates / "default-config.toml", root / ".gitcc.toml"),
         (templates / "default-rules.md", root / "COMMIT_GUIDELINES.md"),
     ]
     if cursor:

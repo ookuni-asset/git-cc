@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-CONFIG_FILENAME = ".gitscribe.toml"
+CONFIG_FILENAME = ".gitcc.toml"
 
 
 @dataclass
@@ -46,7 +46,7 @@ def load(repo_root: Path | None = None, explicit: Path | None = None) -> Config:
     if explicit is not None:
         repo = _load_toml(explicit)
     elif repo_root is not None:
-        for candidate in (repo_root / CONFIG_FILENAME, repo_root / ".gitscribe" / "config.toml"):
+        for candidate in (repo_root / CONFIG_FILENAME, repo_root / ".gitcc" / "config.toml"):
             if candidate.exists():
                 repo = _load_toml(candidate)
                 break
@@ -61,7 +61,7 @@ def _bundled_default_path() -> Path:
 
 def _user_config_path() -> Path:
     base = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
-    return Path(base) / "git-scribe" / "config.toml"
+    return Path(base) / "git-cc" / "config.toml"
 
 
 def _load_toml(path: Path) -> dict[str, Any]:
@@ -130,10 +130,10 @@ def _to_config(d: dict[str, Any]) -> Config:
     if "fallback" in typ:
         cfg.type_fallback = str(typ["fallback"])
 
-    env_cmd = os.environ.get("GIT_SCRIBE_LLM_COMMAND")
+    env_cmd = os.environ.get("GIT_CC_LLM_COMMAND")
     if env_cmd:
         cfg.llm_command = env_cmd
-    env_timeout = os.environ.get("GIT_SCRIBE_LLM_TIMEOUT_SEC")
+    env_timeout = os.environ.get("GIT_CC_LLM_TIMEOUT_SEC")
     if env_timeout:
         cfg.llm_timeout_sec = int(env_timeout)
 
