@@ -73,9 +73,8 @@ git cc                # 生成 → レビュー → commit → push
 
 | コマンド / フラグ | 動作 |
 |---|---|
-| `git cc` | メインフローを実行 |
-| `git cc -a` | 生成前に `git add -A` で全変更をステージ |
-| `git cc --prefer-staged` | staged 済みの変更がある場合、それだけを使って生成 |
+| `git cc` | 生成 → レビュー → commit → push（staged が必要） |
+| `git cc -a` | `git add -A` で全変更をステージしてからメインフローを実行 |
 | `git cc --issue 123` | subject に `#123` を付与 |
 | `git cc --no-push` | commit のみ。push しない |
 | `git cc --no-llm` | LLM をスキップしてヒューリスティックのみで生成 |

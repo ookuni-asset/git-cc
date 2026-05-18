@@ -73,16 +73,15 @@ git cc                # generate → review → commit → push
 
 | Command / flag | Effect |
 |---|---|
-| `git cc` | Run the main flow |
-| `git cc -a` | Stage everything (`git add -A`) before generating |
-| `git cc --prefer-staged` | When something is staged, generate from the staged diff only |
+| `git cc` | Generate → review → commit → push (requires staged changes) |
+| `git cc -a` | Stage everything (`git add -A`) then run main flow |
 | `git cc --issue 123` | Append `#123` to the subject |
 | `git cc --no-push` | Commit only, do not push |
 | `git cc --no-llm` | Skip LLM, use heuristic fallback only |
 | `git cc --dry-run` | Show the message but do not commit |
 | `git cc --lang ja` | Override output language for this run |
 | `git cc --llm-command "cursor agent --print {prompt}"` | Override LLM backend for this run |
-| `git cc print` | Generate and print, no commit |
+| `git cc print` | Generate and print only, no commit |
 | `git cc init` | Bootstrap `.gitcc.toml` + `COMMIT_GUIDELINES.md` |
 | `git cc init --cursor` | Also install Cursor rule / skill files |
 | `git cc config` | Print the resolved configuration (debug) |
