@@ -255,7 +255,7 @@ _INSTALL_HINTS: dict[str, list[str]] = {
     "claude": [
         "  Install Claude Code:",
         "    https://docs.anthropic.com/ja/docs/claude-code/getting-started",
-        "    npm install -g @anthropic-ai/claude-code",
+        "    curl -fsSL https://claude.ai/install.sh | bash",
     ],
     "cursor": [
         "  Install Cursor:",
