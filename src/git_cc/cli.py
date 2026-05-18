@@ -243,10 +243,32 @@ def _run_doctor() -> int:
 
     cfg = config_mod.load(repo_root=root)
     cmd_first = cfg.llm_command.split()[0] if cfg.llm_command else ""
-    check(
-        f"LLM command available: {cmd_first or '(empty)'}",
-        bool(cmd_first) and git.have(cmd_first),
-        hint="install the CLI or set GIT_CC_LLM_COMMAND",
-    )
+    llm_ok = bool(cmd_first) and git.have(cmd_first)
+    check(f"LLM command available: {cmd_first or '(empty)'}", llm_ok)
+    if not llm_ok:
+        _print_install_hint(cmd_first)
 
     return 0 if ok else 1
+
+
+_INSTALL_HINTS: dict[str, list[str]] = {
+    "claude": [
+        "  Install Claude Code:",
+        "    https://docs.anthropic.com/ja/docs/claude-code/getting-started",
+        "    npm install -g @anthropic-ai/claude-code",
+    ],
+    "cursor": [
+        "  Install Cursor:",
+        "    https://www.cursor.com/",
+        "  After installing, enable the CLI via: Cursor > Settings > General > Install 'cursor' command",
+    ],
+}
+
+
+def _print_install_hint(cmd: str) -> None:
+    lines = _INSTALL_HINTS.get(cmd)
+    if lines:
+        for line in lines:
+            print(line)
+    else:
+        print(f"  Install '{cmd}' or set GIT_CC_LLM_COMMAND to switch to another backend.")
