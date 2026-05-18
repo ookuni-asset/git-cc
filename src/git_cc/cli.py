@@ -71,7 +71,6 @@ def main(argv: list[str] | None = None) -> int:
 
 def _add_main_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("-a", "--stage-all", action="store_true", help="run `git add -A` first")
-    p.add_argument("--prefer-staged", action="store_true", help="generate from staged diff when available")
     p.add_argument("--issue", help="issue number (e.g. 123 or #123)")
     p.add_argument("--no-push", action="store_true", help="commit only, do not push")
     p.add_argument("--no-llm", action="store_true", help="skip LLM, use heuristic generator")
@@ -104,10 +103,10 @@ def _run_main(args: argparse.Namespace, *, print_only: bool) -> int:
     if args.stage_all:
         git.stage_all()
 
-    ch = changes_mod.collect(prefer_staged=args.prefer_staged)
+    ch = changes_mod.collect()
     if not ch.files:
-        print("no changes to commit", file=sys.stderr)
-        return 0
+        print("no staged changes — run `git add` first", file=sys.stderr)
+        return 1
 
     _print_change_summary(ch)
     msg = _generate_message(ch, cfg, root=root, issue=issue, no_llm=args.no_llm)
