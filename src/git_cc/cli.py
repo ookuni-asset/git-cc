@@ -258,9 +258,9 @@ _INSTALL_HINTS: dict[str, list[str]] = {
         "    curl -fsSL https://claude.ai/install.sh | bash",
     ],
     "cursor": [
-        "  Install Cursor:",
-        "    https://www.cursor.com/",
-        "  After installing, enable the CLI via: Cursor > Settings > General > Install 'cursor' command",
+        "  Install Cursor CLI:",
+        "    curl https://cursor.com/install -fsS | bash",
+        "    https://cursor.com/docs/cli/overview",
     ],
 }
 
