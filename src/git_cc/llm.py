@@ -13,14 +13,14 @@ def run(*, command: str, prompt: str, timeout_sec: int) -> str:
       resulting string is split with shlex and executed.
     - Otherwise the command is executed and `prompt` is sent on stdin.
     """
-    cmd_str = command
     stdin_data: str | None
-    if "{prompt}" in cmd_str:
-        cmd_str = cmd_str.replace("{prompt}", prompt)
+    if "{prompt}" in command:
+        before, after = command.split("{prompt}", 1)
+        cmd = shlex.split(before) + [prompt] + shlex.split(after)
         stdin_data = None
     else:
+        cmd = shlex.split(command)
         stdin_data = prompt
-    cmd = shlex.split(cmd_str)
     if not cmd:
         raise RuntimeError("LLM command is empty")
     proc = subprocess.run(

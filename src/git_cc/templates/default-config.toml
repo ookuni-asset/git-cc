@@ -20,12 +20,19 @@ search = [
 # External LLM CLI to invoke. If the string contains "{prompt}" it is
 # substituted; otherwise the prompt is sent on stdin.
 #
-# Examples:
-#   Claude (default):  command = "claude"
-#   Cursor:            command = "cursor agent --print {prompt}"
-#   Ollama:            command = "ollama run qwen2.5-coder:7b"
+# Claude (default):
+#   command = "claude"
 #
-# Switch via env var: GIT_CC_LLM_COMMAND="cursor agent --print {prompt}" git cc
+# Cursor (有料プラン):
+#   command = "cursor agent --print --trust {prompt}"
+#
+# Cursor (無料プランは --model auto が必要):
+#   command = "cursor agent --print --trust --model auto {prompt}"
+#
+# Ollama:
+#   command = "ollama run qwen2.5-coder:7b"
+#
+# Switch via env var: GIT_CC_LLM_COMMAND="cursor agent --print --trust {prompt}" git cc
 command     = "claude"
 timeout_sec = 60
 # If true, exit with error when the LLM call fails (no heuristic fallback).
@@ -47,7 +54,7 @@ require_gh = false
 # through to the LLM as a hint, so other codes work if your model
 # supports them. Override per project in .gitcc.toml or per command
 # with `git cc --lang ja`.
-output_lang = "en"
+output_lang = "ja"
 
 [scope]
 # Directory prefix → scope name. First match wins. Customize per project.
