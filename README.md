@@ -34,10 +34,10 @@ If you don't have [uv](https://docs.astral.sh/uv/) yet, install it first:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Then install git-cc from the provided `.whl` file:
+Then install git-cc:
 
 ```bash
-uv tool install git_cc-0.1.0-py3-none-any.whl
+uv tool install --from "git+https://github.com/ookuni-asset/git-cc.git" git-cc
 ```
 
 After install, both `git-cc` and `git cc` work — Git auto-discovers `git-*` binaries on `PATH`.
@@ -50,10 +50,8 @@ git cc doctor
 
 ### Updating
 
-Re-run the install command with the new `.whl` file:
-
 ```bash
-uv tool install --reinstall git_cc-<version>-py3-none-any.whl
+uv tool upgrade git-cc
 ```
 
 ---
