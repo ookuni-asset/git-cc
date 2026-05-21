@@ -34,10 +34,10 @@ git-cc は、Git を使う上で最も繰り返しが多い「整った形式の
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-その後、git-cc をインストールします:
+その後、配布された `.whl` ファイルから git-cc をインストールします:
 
 ```bash
-uv tool install --from "git+https://github.com/ookuni-asset/git-cc.git" git-cc
+uv tool install git_cc-0.1.0-py3-none-any.whl
 ```
 
 インストール後、`git-cc` と `git cc` の両方が使えます（git は `PATH` 上の `git-*` バイナリを自動検出します）。
@@ -50,8 +50,10 @@ git cc doctor
 
 ### アップデート
 
+新しい `.whl` ファイルで再インストールします:
+
 ```bash
-uv tool upgrade git-cc
+uv tool install --reinstall git_cc-<version>-py3-none-any.whl
 ```
 
 ---
